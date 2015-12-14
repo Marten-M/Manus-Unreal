@@ -1,3 +1,5 @@
 Intermediate/
 *.pdb
 *-DebugGame.*
+*/Binaries/
+*/Intermediate/

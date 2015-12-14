@@ -94,7 +94,13 @@ bool UManusVRAnimInstance::NativeEvaluateAnimation(struct FPoseContext& Output)
 			else
 				cpbi = FCompactPoseBoneIndex(bc.GetPoseBoneIndexForBoneName("Leapmotion_Basehand_Rig_Right"));
 			
-			if (Output.Pose[cpbi].IsValid()) Output.Pose[cpbi].SetRotation(palmRotation * FQuat(-1, 1, -1, 1));
+			if (cpbi.GetInt() == -1) 
+			{
+				UE_LOG(LogManusVRAnimation, Warning, TEXT("Cannot find root bone. Possible left/right hand animation mismatch?"));
+				Output.ResetToRefPose();
+				return true;
+			}
+			Output.Pose[cpbi].SetRotation(palmRotation * FQuat(-1, 1, -1, 1));
 			
 			if (bc.IsValid()) {
 				char boneName[] = "finger_00";
@@ -102,7 +108,13 @@ bool UManusVRAnimInstance::NativeEvaluateAnimation(struct FPoseContext& Output)
 				for (int j = 0; j < 4; j++) {
 					boneName[8] = '0' + j;
 					FCompactPoseBoneIndex cpbi(bc.GetPoseBoneIndexForBoneName(boneName));
-					if (Output.Pose[cpbi].IsValid()) Output.Pose[cpbi].SetRotation(pose[cpbi].GetRotation());
+					if (cpbi.GetInt() == -1)
+					{
+						UE_LOG(LogManusVRAnimation, Warning, TEXT("Cannot find bone. Possible incorrect animation?"));
+						Output.ResetToRefPose();
+						return true;
+					}
+					Output.Pose[cpbi].SetRotation(pose[cpbi].GetRotation());
 				}
 			}
 		}	
