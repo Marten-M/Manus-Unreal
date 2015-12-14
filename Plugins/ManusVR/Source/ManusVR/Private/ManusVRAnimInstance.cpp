@@ -64,19 +64,28 @@ bool UManusVRAnimInstance::NativeEvaluateAnimation(struct FPoseContext& Output)
 		return true;
 	}
 	if (RootNode != NULL)
-	{	
+	{
 		GLOVE_DATA data;
-		int retval = ManusGetData(isLeft ? GLOVE_LEFT: GLOVE_RIGHT, &data);
+		int retval = ManusGetData(isLeft ? GLOVE_LEFT : GLOVE_RIGHT, &data);
 		if (retval != MANUS_SUCCESS){
 			Output.ResetToRefPose();
-			UE_LOG(LogManusVRAnimation, Error, TEXT("Unable to obtain data from %s glove"), isLeft ? "left" : "right");
+			//This does not produce desired output. Some Chinese characters show in stead of "right" or "left"
+			//Probably using a stackpointer after the function returned?
+			//UE_LOG(LogManusVRAnimation, Error, TEXT("Unable to obtain data from %s glove"), isLeft ? "left" : "right");
+			if (isLeft) {
+				UE_LOG(LogManusVRAnimation, Error, TEXT("Unable to obtain data from left glove"))
+			}
+			else
+			{
+				UE_LOG(LogManusVRAnimation, Error, TEXT("Unable to obtain data from right glove"))
+			}
 		}
 
 		float fAnimationLength = HandAnimation->GetPlayLength();
-		
+
 		FCompactPose pose;
 		FBlendedCurve curve;
-		for (int i = 0; i < 5; i++) 
+		for (int i = 0; i < 5; i++)
 		{
 			FCompactPose pose;
 			FBlendedCurve curve;
@@ -84,27 +93,27 @@ bool UManusVRAnimInstance::NativeEvaluateAnimation(struct FPoseContext& Output)
 			curve.CopyFrom(Output.Curve);
 			HandAnimation->GetAnimationPose(pose, curve, FAnimExtractContext(data.Fingers[i] * fAnimationLength));
 			FQuat palmRotation(-data.Quaternion.x, data.Quaternion.y, data.Quaternion.z, -data.Quaternion.w);
-			
+
 			auto bc = Output.Pose.GetBoneContainer();
-			
+
 			FCompactPoseBoneIndex cpbi(0);
-			
+
 			if (isLeft)
 				cpbi = FCompactPoseBoneIndex(bc.GetPoseBoneIndexForBoneName("Leapmotion_Basehand_Rig_Left"));
 			else
 				cpbi = FCompactPoseBoneIndex(bc.GetPoseBoneIndexForBoneName("Leapmotion_Basehand_Rig_Right"));
-			
-			if (cpbi.GetInt() == -1) 
+
+			if (cpbi.GetInt() == -1)
 			{
 				UE_LOG(LogManusVRAnimation, Warning, TEXT("Cannot find root bone. Possible left/right hand animation mismatch?"));
 				Output.ResetToRefPose();
 				return true;
 			}
 			Output.Pose[cpbi].SetRotation(palmRotation * FQuat(-1, 1, -1, 1));
-			
+
 			if (bc.IsValid()) {
 				char boneName[] = "finger_00";
-				boneName[7] = '0' + i; 
+				boneName[7] = '0' + i;
 				for (int j = 0; j < 4; j++) {
 					boneName[8] = '0' + j;
 					FCompactPoseBoneIndex cpbi(bc.GetPoseBoneIndexForBoneName(boneName));
@@ -117,12 +126,12 @@ bool UManusVRAnimInstance::NativeEvaluateAnimation(struct FPoseContext& Output)
 					Output.Pose[cpbi].SetRotation(pose[cpbi].GetRotation());
 				}
 			}
-		}	
+		}
 	}
 	else
 	{
 		Output.ResetToRefPose();
 		UE_LOG(LogManusVRAnimation, Warning, TEXT("RootNode==NULL"));
 	}
-	return true; 
+	return true;
 }
