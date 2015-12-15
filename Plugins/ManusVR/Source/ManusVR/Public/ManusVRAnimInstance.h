@@ -1,7 +1,7 @@
 // Copyright 2015 Manus Machina
 
 #pragma once
-#include "Manus.h" // Manus SDK
+#include "Manus.h" 
 #include "ManusVRAnimInstance.generated.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogManusVRAnimation, All, All);
@@ -11,12 +11,12 @@ class UManusVRAnimInstance : public UAnimInstance
 {
 	GENERATED_UCLASS_BODY()
 
-	bool NativeEvaluateAnimation(struct FPoseContext& Output) override;
+		bool NativeEvaluateAnimation(struct FPoseContext& Output) override;
 
 	// Animation to use
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ManusVR)
 		UAnimSequence* HandAnimation;
-	
+
 	// Left or right hand
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ManusVR)
 		bool isLeft;
@@ -33,10 +33,8 @@ class UManusVRAnimInstance : public UAnimInstance
 
 	UFUNCTION(BlueprintCallable, Category = ManusVR)
 		void getRightHandFingers(TArray<float>& OutFingers);
-		
+
 	UFUNCTION(BlueprintCallable, Category = ManusVR)
 		void getLeftHandFingers(TArray<float>& OutFingers);
-		
 
-	
 };

@@ -2,16 +2,10 @@
 
 #include "ManusVRPrivatePCH.h"
 #include "ManusVRAnimInstance.h"
-
-
-#include <Runtime/Engine/Classes/Animation/AnimNodeBase.h> //  Needed for Animation Evaluation in C++
-
+#include <Runtime/Engine/Classes/Animation/AnimNodeBase.h> 
 
 DEFINE_LOG_CATEGORY(LogManusVRAnimation);
 #define LOCTEXT_NAMESPACE "FManusVRModule"
-
-//////////////////////////////////////////////////////////////////////////
-// UManusVRAnimInstance
 
 UManusVRAnimInstance::UManusVRAnimInstance(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -54,24 +48,27 @@ FRotator UManusVRAnimInstance::GetRightHandRotation(){
 	return FRotator();
 }
 
-
 bool UManusVRAnimInstance::NativeEvaluateAnimation(struct FPoseContext& Output)
 {
 	if (useBlueprint) return false;
 	if (HandAnimation == NULL)
 	{
-		UE_LOG(LogManusVRAnimation, Error, TEXT("Animation not set for %s glove"), isLeft ? "left" : "right");
+		if (isLeft) {
+			UE_LOG(LogManusVRAnimation, Error, TEXT("Animation not set for left glove"));
+		}
+		else
+		{
+			UE_LOG(LogManusVRAnimation, Error, TEXT("Animation not set for right glove"));
+		}	
 		return true;
 	}
+
 	if (RootNode != NULL)
 	{
 		GLOVE_DATA data;
 		int retval = ManusGetData(isLeft ? GLOVE_LEFT : GLOVE_RIGHT, &data);
 		if (retval != MANUS_SUCCESS){
 			Output.ResetToRefPose();
-			//This does not produce desired output. Some Chinese characters show in stead of "right" or "left"
-			//Probably using a stackpointer after the function returned?
-			//UE_LOG(LogManusVRAnimation, Error, TEXT("Unable to obtain data from %s glove"), isLeft ? "left" : "right");
 			if (isLeft) {
 				UE_LOG(LogManusVRAnimation, Error, TEXT("Unable to obtain data from left glove"))
 			}
@@ -82,7 +79,6 @@ bool UManusVRAnimInstance::NativeEvaluateAnimation(struct FPoseContext& Output)
 		}
 
 		float fAnimationLength = HandAnimation->GetPlayLength();
-
 		FCompactPose pose;
 		FBlendedCurve curve;
 		for (int i = 0; i < 5; i++)
@@ -93,9 +89,7 @@ bool UManusVRAnimInstance::NativeEvaluateAnimation(struct FPoseContext& Output)
 			curve.CopyFrom(Output.Curve);
 			HandAnimation->GetAnimationPose(pose, curve, FAnimExtractContext(data.Fingers[i] * fAnimationLength));
 			FQuat palmRotation(-data.Quaternion.x, data.Quaternion.y, data.Quaternion.z, -data.Quaternion.w);
-
 			auto bc = Output.Pose.GetBoneContainer();
-
 			FCompactPoseBoneIndex cpbi(0);
 
 			if (isLeft)
@@ -109,6 +103,7 @@ bool UManusVRAnimInstance::NativeEvaluateAnimation(struct FPoseContext& Output)
 				Output.ResetToRefPose();
 				return true;
 			}
+
 			Output.Pose[cpbi].SetRotation(palmRotation * FQuat(-1, 1, -1, 1));
 
 			if (bc.IsValid()) {
