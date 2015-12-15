@@ -1,4 +1,4 @@
-// Copyright 2015 Manus Machina
+// Copyright 2015 Manus VR
 
 #pragma once
 #include "ManusVRController.generated.h"
