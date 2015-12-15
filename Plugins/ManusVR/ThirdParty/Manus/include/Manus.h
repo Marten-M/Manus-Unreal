@@ -56,12 +56,6 @@ typedef struct {
 	unsigned int PacketNumber;
 } GLOVE_DATA;
 
-/*! Structure containing the pose of each bone in the thumb. */
-typedef struct {
-	GLOVE_POSE metacarpal, proximal,
-		distal;
-} GLOVE_THUMB;
-
 /*! Structure containing the pose of each bone in a finger. */
 typedef struct {
 	GLOVE_POSE metacarpal, proximal,
@@ -71,9 +65,7 @@ typedef struct {
 /*! Skeletal model of the hand which contains a pose for the palm and all the bones in the fingers. */
 typedef struct {
 	GLOVE_POSE palm;
-	GLOVE_THUMB thumb;
-	GLOVE_FINGER index, middle,
-		ring, pinky;
+	GLOVE_FINGER thumb, index, middle, ring, pinky;
 } GLOVE_SKELETAL;
 
 /*! Indicates which hand is being queried for.  */
@@ -132,6 +124,22 @@ extern "C" {
 	*  \param model The glove skeletal model.
 	*/
 	MANUS_API int ManusGetSkeletal(GLOVE_HAND hand, GLOVE_SKELETAL* model, unsigned int timeout = 0);
+
+	/*! \brief Get a skeletal model with OSVR fixes for the given glove state.
+	*
+	*  The skeletal model gives the orientation and position of each bone
+	*  in the hand and fingers. The positions are in millimeters relative to
+	*  the position of the hand palm.
+	*
+	*  Since the thumb has no intermediate phalanx it has a separate structure
+	*  in the model.
+	*
+	*  This function is thread-safe.
+	*
+	*  \param hand The left or right hand index.
+	*  \param model The glove skeletal model.
+	*/
+	MANUS_API int ManusGetSkeletalOSVR(GLOVE_HAND hand, GLOVE_SKELETAL* model, unsigned int timeout = 0);
 
 	/*! \brief Configure the handedness of the glove.
 	*
