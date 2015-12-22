@@ -15,7 +15,8 @@ UManusVRAnimInstance::UManusVRAnimInstance(const FObjectInitializer& ObjectIniti
 void UManusVRAnimInstance::getLeftHandFingers(TArray<float>& OutFingers)
 {
 	GLOVE_DATA data;
-	int retval = retval = ManusGetData(GLOVE_LEFT, &data);
+	int retval = MANUS_ERROR;
+	if (_ManusGetData) retval = _ManusGetData(GLOVE_LEFT, &data, 0);
 	if (MANUS_SUCCESS == retval) {
 		OutFingers.Append(data.Fingers, 5);
 	}
@@ -24,7 +25,8 @@ void UManusVRAnimInstance::getLeftHandFingers(TArray<float>& OutFingers)
 void UManusVRAnimInstance::getRightHandFingers(TArray<float>& OutFingers)
 {
 	GLOVE_DATA data;
-	int retval = retval = ManusGetData(GLOVE_RIGHT, &data);
+	int retval = MANUS_ERROR;
+	if (_ManusGetData) retval = _ManusGetData(GLOVE_RIGHT, &data, 0);
 	if (MANUS_SUCCESS == retval) {
 		OutFingers.Append(data.Fingers, 5);
 	}
@@ -32,7 +34,8 @@ void UManusVRAnimInstance::getRightHandFingers(TArray<float>& OutFingers)
 
 FRotator UManusVRAnimInstance::GetLeftHandRotation(){
 	GLOVE_DATA data;
-	int retval = retval = ManusGetData(GLOVE_LEFT, &data);
+	int retval = MANUS_ERROR;
+	if (_ManusGetData) retval = _ManusGetData(GLOVE_LEFT, &data, 0);
 	if (MANUS_SUCCESS == retval) {
 		return FRotator(FQuat(data.Quaternion.x, data.Quaternion.y, data.Quaternion.z, data.Quaternion.w));
 	}
@@ -41,7 +44,8 @@ FRotator UManusVRAnimInstance::GetLeftHandRotation(){
 
 FRotator UManusVRAnimInstance::GetRightHandRotation(){
 	GLOVE_DATA data;
-	int retval = retval = ManusGetData(GLOVE_RIGHT, &data);
+	int retval = MANUS_ERROR;
+	if (_ManusGetData) retval = _ManusGetData(GLOVE_RIGHT, &data, 0);
 	if (MANUS_SUCCESS == retval) {
 		return FRotator(FQuat(data.Quaternion.x, data.Quaternion.y, data.Quaternion.z, data.Quaternion.w));
 	}
@@ -66,7 +70,9 @@ bool UManusVRAnimInstance::NativeEvaluateAnimation(struct FPoseContext& Output)
 	if (RootNode != NULL)
 	{
 		GLOVE_DATA data;
-		int retval = ManusGetData(isLeft ? GLOVE_LEFT : GLOVE_RIGHT, &data);
+		int retval = MANUS_ERROR;
+		if (_ManusGetData) retval = _ManusGetData(isLeft ? GLOVE_LEFT : GLOVE_RIGHT, &data, 0);
+
 		if (retval != MANUS_SUCCESS){
 			Output.ResetToRefPose();
 			if (isLeft) {

@@ -1,7 +1,7 @@
 // Copyright 2015 Manus Machina
 
 #pragma once
-#include "Manus.h" 
+#include "ManusLib.h"
 #include "ManusVRAnimInstance.generated.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogManusVRAnimation, All, All);

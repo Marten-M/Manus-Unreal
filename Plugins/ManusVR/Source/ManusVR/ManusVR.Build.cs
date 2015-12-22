@@ -55,23 +55,6 @@ public class ManusVR : ModuleRules
         LoadManusLib(Target);
     }
 
-    // https://github.com/fmod/ue4integration/blob/master/FMODStudio/Source/FMODStudio/FMODStudio.Build.cs
-    private void CopyFile(string source, string dest)
-    {
-        if (System.IO.File.Exists(dest))
-        {
-            System.IO.File.SetAttributes(dest, System.IO.File.GetAttributes(dest) & ~System.IO.FileAttributes.ReadOnly);
-        }
-        try
-        {
-            System.IO.File.Copy(source, dest, true);
-        }
-        catch (System.Exception ex)
-        {
-            System.Console.WriteLine("Failed to copy file: {0}", ex.Message);
-        }
-    }
-
     public bool LoadManusLib(TargetInfo Target)
     {
         bool isLibrarySupported = false;
@@ -82,18 +65,6 @@ public class ManusVR : ModuleRules
 
             string PlatformString = (Target.Platform == UnrealTargetPlatform.Win64) ? "Win64" : "Win32";
 
-            PublicAdditionalLibraries.Add(Path.Combine(LibraryPath, PlatformString, "Manus.lib"));
-
-            string From = Path.Combine(LibraryPath, PlatformString, "Manus.dll");
-            string destPathEditor = (ModulePath + "/../../Binaries/" + PlatformString);
-            string destPathRelease = (ModulePath + "/../../../../Binaries/" + PlatformString);
-
-            System.IO.Directory.CreateDirectory(destPathEditor);
-            System.IO.Directory.CreateDirectory(destPathRelease);
-            destPathEditor += "/Manus.dll";
-            destPathRelease += "/Manus.dll";
-            CopyFile(From, destPathEditor);
-            CopyFile(From, destPathRelease);
         }
         return isLibrarySupported;
     }

@@ -1,8 +1,8 @@
 // Copyright 2015 Manus VR
 
 #include "ManusVRPrivatePCH.h"
-#include "Manus.h"
 #include "ManusVRController.h"
+#include "ManusLib.h"
 
 DEFINE_LOG_CATEGORY(LogManusVRController);
 #define LOCTEXT_NAMESPACE "FManusVRModule"
@@ -39,7 +39,8 @@ void UManusVRController::TickComponent(float DeltaTime, enum ELevelTick TickType
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	GLOVE_DATA data;
-	int retval = retval = ManusGetData(GLOVE_LEFT, &data);
+	int retval = MANUS_ERROR;
+	if (_ManusGetData) retval = _ManusGetData(GLOVE_LEFT, &data, 0);
 	if (MANUS_SUCCESS == retval) {
 		// Note: There is a factor 3 in the values sent and received
 		EmitAnalogInputEventForKey(EManus::Left_Thumb,  data.Fingers[0], 0, 0);
@@ -49,7 +50,7 @@ void UManusVRController::TickComponent(float DeltaTime, enum ELevelTick TickType
 		EmitAnalogInputEventForKey(EManus::Left_Pinky,  data.Fingers[4], 0, 0);
 	}
 
-	retval = ManusGetData(GLOVE_RIGHT, &data);
+	if (_ManusGetData) retval = _ManusGetData(GLOVE_RIGHT, &data, 0);
 	if (MANUS_SUCCESS == retval) {
 		EmitAnalogInputEventForKey(EManus::Right_Thumb,  data.Fingers[0], 0, 0);
 		EmitAnalogInputEventForKey(EManus::Right_Index,  data.Fingers[1], 0, 0);

@@ -22,7 +22,6 @@ struct EManus
 	static const FKey Right_Pinky;
 };
 
-
 UCLASS(ClassGroup = Input, meta = (BlueprintSpawnableComponent))
 class UManusVRController : public UActorComponent
 {
