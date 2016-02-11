@@ -82,6 +82,7 @@ bool UManusVRAnimInstance::NativeEvaluateAnimation(struct FPoseContext& Output)
 			{
 				UE_LOG(LogManusVRAnimation, Error, TEXT("Unable to obtain data from right glove"))
 			}
+			return true;
 		}
 
 		float fAnimationLength = HandAnimation->GetPlayLength();
