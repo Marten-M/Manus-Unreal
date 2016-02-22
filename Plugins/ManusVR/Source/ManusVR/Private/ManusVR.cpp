@@ -29,7 +29,7 @@ const FKey EManus::Right_Pinky("ManusRightPinky");
 
 void FManusVRModule::StartupModule()
 {
-	UE_LOG(LogManusVR, Error, TEXT("Initialising Manus Library"));
+	UE_LOG(LogManusVR, Log, TEXT("Initialising Manus Library"));
 
 	FString filePath = FPaths::Combine(*FPaths::GamePluginsDir(), 
 		TEXT("ManusVR/ThirdParty/Manus/lib"), 
@@ -51,12 +51,12 @@ void FManusVRModule::StartupModule()
 		}
 		else
 		{
-			UE_LOG(LogManusVR, Error, TEXT("Cannot Obtain DLL Handle"))
+			UE_LOG(LogManusVR, Warning, TEXT("Cannot Obtain DLL Handle"))
 		}
 	}
 	else
 	{
-		UE_LOG(LogManusVR, Error, TEXT("Cannot Find DLL %s"), *filePath)
+		UE_LOG(LogManusVR, Warning, TEXT("Cannot Find DLL %s"), *filePath)
 	}
 
 	if (_ManusInit) {
