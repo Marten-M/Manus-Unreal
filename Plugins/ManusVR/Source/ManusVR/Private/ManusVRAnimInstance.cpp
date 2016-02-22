@@ -58,11 +58,11 @@ bool UManusVRAnimInstance::NativeEvaluateAnimation(struct FPoseContext& Output)
 	if (HandAnimation == NULL)
 	{
 		if (isLeft) {
-			UE_LOG(LogManusVRAnimation, Error, TEXT("Animation not set for left glove"));
+			UE_LOG(LogManusVRAnimation, Warning, TEXT("Animation not set for left glove"));
 		}
 		else
 		{
-			UE_LOG(LogManusVRAnimation, Error, TEXT("Animation not set for right glove"));
+			UE_LOG(LogManusVRAnimation, Warning, TEXT("Animation not set for right glove"));
 		}	
 		return true;
 	}
@@ -76,11 +76,11 @@ bool UManusVRAnimInstance::NativeEvaluateAnimation(struct FPoseContext& Output)
 		if (retval != MANUS_SUCCESS){
 			Output.ResetToRefPose();
 			if (isLeft) {
-				UE_LOG(LogManusVRAnimation, Error, TEXT("Unable to obtain data from left glove"))
+				UE_LOG(LogManusVRAnimation, Warning, TEXT("Unable to obtain data from left glove"))
 			}
 			else
 			{
-				UE_LOG(LogManusVRAnimation, Error, TEXT("Unable to obtain data from right glove"))
+				UE_LOG(LogManusVRAnimation, Warning, TEXT("Unable to obtain data from right glove"))
 			}
 			return true;
 		}
