@@ -1,3 +1,4 @@
+// Copyright 1998-2015 Epic Games, Inc. All Rights Reserved.
 // Copyright 2015 Manus VR
 
 #include "ManusVRPrivatePCH.h"
@@ -12,70 +13,85 @@ UManusVRAnimInstance::UManusVRAnimInstance(const FObjectInitializer& ObjectIniti
 {
 }
 
-void UManusVRAnimInstance::getLeftHandFingers(TArray<float>& OutFingers)
+void UManusVRAnimInstance::GetLeftHandFingers(TArray<float>& OutFingers)
 {
-	GLOVE_DATA data;
-	int retval = MANUS_ERROR;
-	if (_ManusGetData) retval = _ManusGetData(GLOVE_LEFT, &data, 0);
-	if (MANUS_SUCCESS == retval) {
-		OutFingers.Append(data.Fingers, 5);
+	if (_ManusGetData) 
+	{
+		GLOVE_DATA Data;
+		if (MANUS_SUCCESS == _ManusGetData(GLOVE_LEFT, &Data, 0))
+		{
+			OutFingers.Append(Data.Fingers, 5);
+		}
 	}
 }
 
-void UManusVRAnimInstance::getRightHandFingers(TArray<float>& OutFingers)
+void UManusVRAnimInstance::GetRightHandFingers(TArray<float>& OutFingers)
 {
-	GLOVE_DATA data;
-	int retval = MANUS_ERROR;
-	if (_ManusGetData) retval = _ManusGetData(GLOVE_RIGHT, &data, 0);
-	if (MANUS_SUCCESS == retval) {
-		OutFingers.Append(data.Fingers, 5);
+	if (_ManusGetData)
+	{
+		GLOVE_DATA Data;
+		if (MANUS_SUCCESS == _ManusGetData(GLOVE_RIGHT, &Data, 0))
+		{
+			OutFingers.Append(Data.Fingers, 5);
+		}
 	}
 }
 
-FRotator UManusVRAnimInstance::GetLeftHandRotation(){
-	GLOVE_DATA data;
-	int retval = MANUS_ERROR;
-	if (_ManusGetData) retval = _ManusGetData(GLOVE_LEFT, &data, 0);
-	if (MANUS_SUCCESS == retval) {
-		return FRotator(FQuat(data.Quaternion.x, data.Quaternion.y, data.Quaternion.z, data.Quaternion.w));
+FRotator UManusVRAnimInstance::GetLeftHandRotation()
+{	
+	if (_ManusGetData)
+	{
+		GLOVE_DATA Data;
+		if (MANUS_SUCCESS == _ManusGetData(GLOVE_LEFT, &Data, 0))
+		{
+			return FRotator(FQuat(Data.Quaternion.x, Data.Quaternion.y, Data.Quaternion.z, Data.Quaternion.w));
+		}
 	}
-	return FRotator();
+	return FRotator(ForceInitToZero);
 }
 
-FRotator UManusVRAnimInstance::GetRightHandRotation(){
-	GLOVE_DATA data;
-	int retval = MANUS_ERROR;
-	if (_ManusGetData) retval = _ManusGetData(GLOVE_RIGHT, &data, 0);
-	if (MANUS_SUCCESS == retval) {
-		return FRotator(FQuat(data.Quaternion.x, data.Quaternion.y, data.Quaternion.z, data.Quaternion.w));
+FRotator UManusVRAnimInstance::GetRightHandRotation()
+{
+	if (_ManusGetData)
+	{
+		GLOVE_DATA Data;
+		if (MANUS_SUCCESS == _ManusGetData(GLOVE_RIGHT, &Data, 0))
+		{
+			return FRotator(FQuat(Data.Quaternion.x, Data.Quaternion.y, Data.Quaternion.z, Data.Quaternion.w));
+		}
 	}
-	return FRotator();
+	return FRotator(ForceInitToZero);
 }
 
 bool UManusVRAnimInstance::NativeEvaluateAnimation(struct FPoseContext& Output)
 {
-	if (useBlueprint) return false;
-	if (HandAnimation == NULL)
+	if (bUseBlueprint)
+		return false;
+	
+	if (HandAnimation == nullptr)
 	{
-		if (isLeft) {
+		if (bIsLeft)
+		{
 			UE_LOG(LogManusVRAnimation, Warning, TEXT("Animation not set for left glove"));
 		}
-		else
+		else 
 		{
 			UE_LOG(LogManusVRAnimation, Warning, TEXT("Animation not set for right glove"));
 		}	
 		return true;
 	}
 
-	if (RootNode != NULL)
+	if (RootNode != nullptr)
 	{
-		GLOVE_DATA data;
-		int retval = MANUS_ERROR;
-		if (_ManusGetData) retval = _ManusGetData(isLeft ? GLOVE_LEFT : GLOVE_RIGHT, &data, 0);
+		if (!_ManusGetData)
+			return true;
 
-		if (retval != MANUS_SUCCESS){
+		GLOVE_DATA Data;
+		if (MANUS_SUCCESS != _ManusGetData(bIsLeft ? GLOVE_LEFT : GLOVE_RIGHT, &Data, 0))
+		{
 			Output.ResetToRefPose();
-			if (isLeft) {
+			if (bIsLeft)
+			{
 				UE_LOG(LogManusVRAnimation, Warning, TEXT("Unable to obtain data from left glove"))
 			}
 			else
@@ -85,47 +101,47 @@ bool UManusVRAnimInstance::NativeEvaluateAnimation(struct FPoseContext& Output)
 			return true;
 		}
 
-		float fAnimationLength = HandAnimation->GetPlayLength();
-		FCompactPose pose;
-		FBlendedCurve curve;
-		for (int i = 0; i < 5; i++)
+		float AnimationLength = HandAnimation->GetPlayLength();
+		for (int32 i = 0; i < 5; i++)
 		{
-			FCompactPose pose;
-			FBlendedCurve curve;
-			pose.CopyBonesFrom(Output.Pose);
-			curve.CopyFrom(Output.Curve);
-			HandAnimation->GetAnimationPose(pose, curve, FAnimExtractContext(data.Fingers[i] * fAnimationLength));
-			FQuat palmRotation(-data.Quaternion.x, data.Quaternion.y, data.Quaternion.z, -data.Quaternion.w);
-			auto bc = Output.Pose.GetBoneContainer();
-			FCompactPoseBoneIndex cpbi(0);
+			FCompactPose Pose;
+			FBlendedCurve Curve;
+			Pose.CopyBonesFrom(Output.Pose);
+			Curve.CopyFrom(Output.Curve);
+			HandAnimation->GetAnimationPose(Pose, Curve, FAnimExtractContext(Data.Fingers[i] * AnimationLength));
+			FQuat PalmRotation(-Data.Quaternion.x, Data.Quaternion.y, Data.Quaternion.z, -Data.Quaternion.w);
+			auto BoneContainer = Output.Pose.GetBoneContainer();
+			FCompactPoseBoneIndex CompactPoseBoneIndex(0);
 
-			if (isLeft)
-				cpbi = FCompactPoseBoneIndex(bc.GetPoseBoneIndexForBoneName("Leapmotion_Basehand_Rig_Left"));
+			if (bIsLeft)
+				CompactPoseBoneIndex = FCompactPoseBoneIndex(BoneContainer.GetPoseBoneIndexForBoneName("Leapmotion_Basehand_Rig_Left"));
 			else
-				cpbi = FCompactPoseBoneIndex(bc.GetPoseBoneIndexForBoneName("Leapmotion_Basehand_Rig_Right"));
+				CompactPoseBoneIndex = FCompactPoseBoneIndex(BoneContainer.GetPoseBoneIndexForBoneName("Leapmotion_Basehand_Rig_Right"));
 
-			if (cpbi.GetInt() == -1)
+			if (CompactPoseBoneIndex.GetInt() == -1)
 			{
 				UE_LOG(LogManusVRAnimation, Warning, TEXT("Cannot find root bone. Possible left/right hand animation mismatch?"));
 				Output.ResetToRefPose();
 				return true;
 			}
 
-			Output.Pose[cpbi].SetRotation(palmRotation * FQuat(-1, 1, -1, 1));
+			Output.Pose[CompactPoseBoneIndex].SetRotation(PalmRotation * FQuat(-1, 1, -1, 1));
 
-			if (bc.IsValid()) {
-				char boneName[] = "finger_00";
-				boneName[7] = '0' + i;
-				for (int j = 0; j < 4; j++) {
-					boneName[8] = '0' + j;
-					FCompactPoseBoneIndex cpbi(bc.GetPoseBoneIndexForBoneName(boneName));
-					if (cpbi.GetInt() == -1)
+			if (BoneContainer.IsValid())
+			{
+				char BoneName[] = "finger_00";
+				BoneName[7] = '0' + i;
+				for (int32 j = 0; j < 4; j++)
+				{
+					BoneName[8] = '0' + j;
+					FCompactPoseBoneIndex CompactPoseBoneIndex(BoneContainer.GetPoseBoneIndexForBoneName(BoneName));
+					if (CompactPoseBoneIndex.GetInt() == -1)
 					{
 						UE_LOG(LogManusVRAnimation, Warning, TEXT("Cannot find bone. Possible incorrect animation?"));
 						Output.ResetToRefPose();
 						return true;
 					}
-					Output.Pose[cpbi].SetRotation(pose[cpbi].GetRotation());
+					Output.Pose[CompactPoseBoneIndex].SetRotation(Pose[CompactPoseBoneIndex].GetRotation());
 				}
 			}
 		}
@@ -134,6 +150,8 @@ bool UManusVRAnimInstance::NativeEvaluateAnimation(struct FPoseContext& Output)
 	{
 		Output.ResetToRefPose();
 		UE_LOG(LogManusVRAnimation, Warning, TEXT("RootNode==NULL"));
+		return true;
 	}
+
 	return true;
 }

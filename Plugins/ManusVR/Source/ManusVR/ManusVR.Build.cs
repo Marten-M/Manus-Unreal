@@ -1,3 +1,4 @@
+// Copyright 1998-2015 Epic Games, Inc. All Rights Reserved.
 // Copyright 2015 Manus VR
 
 using UnrealBuildTool;
@@ -65,6 +66,10 @@ public class ManusVR : ModuleRules
 
             string PlatformString = (Target.Platform == UnrealTargetPlatform.Win64) ? "Win64" : "Win32";
 
+            string BaseDirectory = Path.GetFullPath(Path.Combine(ModuleDirectory, "..", ".."));
+            string ManusDirectory = Path.Combine(BaseDirectory, "ThirdParty", "manus", "lib", PlatformString);
+
+            RuntimeDependencies.Add(new RuntimeDependency(Path.Combine(ManusDirectory, "Manus.dll")));
         }
         return isLibrarySupported;
     }

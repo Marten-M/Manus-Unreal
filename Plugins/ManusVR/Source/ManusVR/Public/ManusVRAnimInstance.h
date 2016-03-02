@@ -1,3 +1,4 @@
+// Copyright 1998-2015 Epic Games, Inc. All Rights Reserved.
 // Copyright 2015 Manus Machina
 
 #pragma once
@@ -19,11 +20,11 @@ class UManusVRAnimInstance : public UAnimInstance
 
 	// Left or right hand
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ManusVR)
-		bool isLeft;
+		bool bIsLeft;
 
 	// Use Blueprint glove processing or build-in
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ManusVR)
-		bool useBlueprint = false;
+		bool bUseBlueprint = false;
 
 	UFUNCTION(BlueprintCallable, Category = ManusVR)
 		FRotator GetLeftHandRotation();
@@ -32,9 +33,9 @@ class UManusVRAnimInstance : public UAnimInstance
 		FRotator GetRightHandRotation();
 
 	UFUNCTION(BlueprintCallable, Category = ManusVR)
-		void getRightHandFingers(TArray<float>& OutFingers);
+		void GetRightHandFingers(TArray<float>& OutFingers);
 
 	UFUNCTION(BlueprintCallable, Category = ManusVR)
-		void getLeftHandFingers(TArray<float>& OutFingers);
+		void GetLeftHandFingers(TArray<float>& OutFingers);
 
 };

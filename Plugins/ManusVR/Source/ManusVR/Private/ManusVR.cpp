@@ -1,3 +1,4 @@
+// Copyright 1998-2015 Epic Games, Inc. All Rights Reserved.
 // Copyright 2015 Manus VR
 
 #include "ManusVRPrivatePCH.h"
@@ -9,9 +10,9 @@ IMPLEMENT_MODULE(FManusVRModule, ManusVR)
 DEFINE_LOG_CATEGORY(LogManusVR);
 #define LOCTEXT_NAMESPACE "FManusVRModule"
 
-int_void _ManusInit = NULL;
-int_void _ManusExit = NULL;
-int_hand_pdata_uint _ManusGetData = NULL;
+int_void _ManusInit = nullptr;
+int_void _ManusExit = nullptr;
+int_hand_pdata_uint _ManusGetData = nullptr;
 
 const FKey EManus::Left_Palm("ManusLeftPalm");
 const FKey EManus::Left_Thumb("ManusLeftThumb");
@@ -31,23 +32,23 @@ void FManusVRModule::StartupModule()
 {
 	UE_LOG(LogManusVR, Log, TEXT("Initialising Manus Library"));
 
-	FString filePath = FPaths::Combine(*FPaths::GamePluginsDir(), 
+	const FString FilePath = FPaths::Combine(*FPaths::GamePluginsDir(), 
 		TEXT("ManusVR/ThirdParty/Manus/lib"), 
 		TEXT(PlatformString), 
 		TEXT("Manus.dll"));
 
-	if (FPaths::FileExists(filePath))
+	if (FPaths::FileExists(FilePath))
 	{
-		void *DLLHandle;
-		DLLHandle = FPlatformProcess::GetDllHandle(*filePath); 
-		if (DLLHandle != NULL)
+		void* DLLHandle;
+		DLLHandle = FPlatformProcess::GetDllHandle(*FilePath);
+		if (DLLHandle != nullptr)
 		{
-			FString procName = "ManusInit";
-			_ManusInit = (int_void)FPlatformProcess::GetDllExport(DLLHandle, *procName);
-			procName = "ManusExit";
-			_ManusExit = (int_void)FPlatformProcess::GetDllExport(DLLHandle, *procName);
-			procName = "ManusGetData";
-			_ManusGetData = (int_hand_pdata_uint)FPlatformProcess::GetDllExport(DLLHandle, *procName);
+			FString ProcName = "ManusInit";
+			_ManusInit = (int_void)FPlatformProcess::GetDllExport(DLLHandle, *ProcName);
+			ProcName = "ManusExit";
+			_ManusExit = (int_void)FPlatformProcess::GetDllExport(DLLHandle, *ProcName);
+			ProcName = "ManusGetData";
+			_ManusGetData = (int_hand_pdata_uint)FPlatformProcess::GetDllExport(DLLHandle, *ProcName);
 		}
 		else
 		{
@@ -56,10 +57,11 @@ void FManusVRModule::StartupModule()
 	}
 	else
 	{
-		UE_LOG(LogManusVR, Warning, TEXT("Cannot Find DLL %s"), *filePath)
+		UE_LOG(LogManusVR, Warning, TEXT("Cannot Find DLL %s"), *FilePath)
 	}
 
-	if (_ManusInit) {
+	if (_ManusInit) 
+	{
 		_ManusInit();
 
 		EKeys::AddKey(FKeyDetails(EManus::Left_Palm, LOCTEXT("ManusLeftPalm", "ManusVR Left Palm"), FKeyDetails::VectorAxis, "Manus"));
@@ -80,7 +82,10 @@ void FManusVRModule::StartupModule()
 
 void FManusVRModule::ShutdownModule()
 {
-	if (_ManusExit) _ManusExit();
+	if (_ManusExit)
+	{
+		_ManusExit();
+	}	
 }
 
 #undef LOCTEXT_NAMESPACE
