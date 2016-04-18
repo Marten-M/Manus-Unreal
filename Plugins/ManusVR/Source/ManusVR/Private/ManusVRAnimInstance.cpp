@@ -11,6 +11,9 @@ DEFINE_LOG_CATEGORY(LogManusVRAnimation);
 UManusVRAnimInstance::UManusVRAnimInstance(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+#if (ENGINE_MAJOR_VERSION >= 4) && (ENGINE_MINOR_VERSION >= 11)
+	Proxy.ManusVRAnimInstance = this;
+#endif
 }
 
 void UManusVRAnimInstance::GetLeftHandFingers(TArray<float>& OutFingers)
@@ -63,7 +66,22 @@ FRotator UManusVRAnimInstance::GetRightHandRotation()
 	return FRotator(ForceInitToZero);
 }
 
+#if (ENGINE_MAJOR_VERSION >= 4) && (ENGINE_MINOR_VERSION >= 11)
+bool FManusVRAnimInstanceProxy::Evaluate(FPoseContext& Output)
+{
+	if (ManusVRAnimInstance == nullptr)
+	{
+		UE_LOG(LogManusVRAnimation, Warning, TEXT("AnimInstance not initialized"));
+		return false;
+	}
+
+	return ManusVRAnimInstance->ManusEvaluate(Output);
+}
+
+bool UManusVRAnimInstance::ManusEvaluate(struct FPoseContext& Output)
+#else
 bool UManusVRAnimInstance::NativeEvaluateAnimation(struct FPoseContext& Output)
+#endif
 {
 	if (bUseBlueprint)
 		return false;
@@ -81,7 +99,11 @@ bool UManusVRAnimInstance::NativeEvaluateAnimation(struct FPoseContext& Output)
 		return true;
 	}
 
+#if (ENGINE_MAJOR_VERSION >= 4) && (ENGINE_MINOR_VERSION >= 11)
+	if(Proxy.GetRootNode() != nullptr)
+#else
 	if (RootNode != nullptr)
+#endif
 	{
 		if (!_ManusGetData)
 			return true;
