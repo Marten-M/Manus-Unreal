@@ -8,7 +8,7 @@ public class ManusVR : ModuleRules
 {
     private string ModulePath
     {
-        get { return ModuleDirectory; } //.../ThirdParty/ }
+        get { return ModuleDirectory; }
     }
 
     private string ThirdPartyPath
