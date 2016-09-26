@@ -156,14 +156,14 @@ bool UManusVRAnimInstance::NativeEvaluateAnimation(struct FPoseContext& Output)
 				for (int32 j = 0; j < 4; j++)
 				{
 					BoneName[8] = '0' + j;
-					FCompactPoseBoneIndex CompactPoseBoneIndex(BoneContainer.GetPoseBoneIndexForBoneName(BoneName));
-					if (CompactPoseBoneIndex.GetInt() == -1)
+					FCompactPoseBoneIndex CompactPoseBoneIndexFinger(BoneContainer.GetPoseBoneIndexForBoneName(BoneName));
+					if (CompactPoseBoneIndexFinger.GetInt() == -1)
 					{
 						UE_LOG(LogManusVRAnimation, Warning, TEXT("Cannot find bone. Possible incorrect animation?"));
 						Output.ResetToRefPose();
 						return true;
 					}
-					Output.Pose[CompactPoseBoneIndex].SetRotation(Pose[CompactPoseBoneIndex].GetRotation());
+					Output.Pose[CompactPoseBoneIndexFinger].SetRotation(Pose[CompactPoseBoneIndexFinger].GetRotation());
 				}
 			}
 		}
