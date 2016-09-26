@@ -35,7 +35,7 @@ class UManusVRAnimInstance : public UAnimInstance
 #if (ENGINE_MAJOR_VERSION >= 4) && (ENGINE_MINOR_VERSION >= 11)
 	bool ManusEvaluate(struct FPoseContext& Output);
 #else
-		bool NativeEvaluateAnimation(struct FPoseContext& Output) override;
+	bool NativeEvaluateAnimation(struct FPoseContext& Output) override;
 #endif
 
 	// Animation to use
@@ -65,8 +65,7 @@ class UManusVRAnimInstance : public UAnimInstance
 
 #if (ENGINE_MAJOR_VERSION >= 4) && (ENGINE_MINOR_VERSION >= 11)
 private:
-	UPROPERTY(Transient, BlueprintReadOnly, Category = ManusVR, meta = (AllowPrivateAccess = "true"))
-		FManusVRAnimInstanceProxy Proxy;
+	FManusVRAnimInstanceProxy Proxy;
 
 	virtual FAnimInstanceProxy* CreateAnimInstanceProxy() override { return& Proxy; }
 	virtual void DestroyAnimInstanceProxy(FAnimInstanceProxy* InProxy) override {}
